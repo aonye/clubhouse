@@ -4,15 +4,14 @@ let Schema = mongoose.Schema;
 
 let UserSchema = new Schema(
     {
+        first_name: { type: String, unique: true, required: true },
+        last_name: { type: String },
+        membership_status: { type: Boolean },
+        message: { type: String },
         username: { type: String },
         password: { type: String },
     }
 );
-
-// first_name: { type: String, unique: true, required: true },
-// last_name: { type: String },
-// membership_status: { type: Boolean },
-// message: { type: String },
 
 UserSchema
     .virtual('url')
