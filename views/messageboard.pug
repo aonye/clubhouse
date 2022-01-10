@@ -1,0 +1,53 @@
+extends layout
+
+block content
+  section.section-wrapper
+    h1 Clubhouse Messageboard
+    
+    if messages === undefined
+      span No messages
+    else
+      section.msgs-cont-wrapper
+        div.msgs-cont
+          for message in messages
+            if user.membership_status === false
+              if message.index % 2 === 0
+                div.left-msg
+                  img(class='chat-acct-icon' src='/assets/images/chat_acct_icon.png' height='30' width='30' style='margin-right: 5px')
+                  div
+                    span Anonymous Andy | #{message.title}
+                    div #{message.text}
+              else
+                div.right-msg
+                  div
+                    span Anonymous Andy | #{message.title}
+                    div #{message.text}
+                  img(class='chat-acct-icon' src='/assets/images/chat_acct_icon.png' height='30' width='30' style='margin-left: 5px, border-radius: 50%')
+            else
+              if message.index % 2 === 0
+                div.left-msg
+                  img(class='chat-acct-icon' src='/assets/images/chat_acct_icon.png' height='30' width='30' style='margin-right: 5px')
+                  div
+                    span #{message.user.username} | #{message.title}
+                    div #{message.text}
+              else
+                div.right-msg
+                  div
+                    span #{message.user.username} | #{message.title}
+                    div #{message.text}
+                  img(class='chat-acct-icon' src='/assets/images/chat_acct_icon.png' height='30' width='30' style='margin-left: 5px, border-radius: 50%')
+        
+    form(class='msgs-form' method='POST' action='')
+      div.form-group
+        label(for='username') Username: 
+        input.form-control(type='text', name='username')
+    
+      div.form-group
+        label(for='password') Password: 
+        input.form-control(type='password', name='password')
+    
+      div.form-group
+        label(for='confirmpw') Confirm Password: 
+        input.form-control(type='password', name='confirmpw')
+
+      button.btn.btn-primary(type='submit') Submit

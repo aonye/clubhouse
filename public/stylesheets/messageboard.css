@@ -1,0 +1,55 @@
+.msgs-cont-wrapper {
+    background-color: white;
+    height: 100% !important;
+    min-height: 800px;
+    width: 900px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    border-radius: 5%;
+}
+
+.msgs-cont {
+    margin-top: 2%;
+    margin-bottom: 2%;
+    height: 80%;
+    width: 90%;
+    font-size: 16px;
+    color: black;
+    display: flex;
+    flex-flow: column wrap;
+}
+
+.msg-unit-wrapper {
+    display: flex;
+    align-items: center
+}
+
+.left-msg {
+    display: flex;
+    align-items: center;
+    width: fit-content;
+    max-width: 40%;
+}
+
+.msgs-cont * {
+    background-color: rgb(228, 230, 235);
+    border-radius: 5%;
+}
+
+.right-msg {
+    display: flex;
+    align-items: center;
+    width: fit-content;
+    max-width: 40%;
+    align-self: flex-end;
+}
+
+.chat-acct-icon {
+    border-radius: 50%;
+}
+
+.msgs-form {
+    margin: 50px 50px 50px 50px;
+}

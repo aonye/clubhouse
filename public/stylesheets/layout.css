@@ -1,4 +1,5 @@
 @import url('../stylesheets/main.css');
+@import url('../stylesheets/messageboard.css');
 /* @import url('../stylesheets/index.css'); */
 
 /* @import url('../stylesheets/devices.css');
@@ -22,14 +23,33 @@ nav {
     align-items: center;
 }
 
-.github {
-    height: 50px;
-    width: 50px;
+.nav-right {
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+}
+
+.user-buttons {
+    margin-right: 40px;
 }
 
 .logo {
   display: flex;
   width: 240px;
+}
+
+.nav-img-size {
+    height: 35px;
+    width: 35px;
+}
+
+.github-logo {
+    height: 50px;
+    width: 50px;
+}
+
+.margin-left {
+    margin-left: 10px;
 }
 
 .spin {
@@ -72,6 +92,7 @@ nav {
 
 footer {
     background-color: rgb(241, 239, 227);
+    color: rgb(34, 31, 20);
     font-size: 15px;
     font-weight: 800;
     text-align: center;

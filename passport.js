@@ -6,7 +6,7 @@ const User = require('./models/user');
 
 passport.use(
     new LocalStrategy((username, password, done) => {
-        console.log('auth')
+        console.log('auth', username, password)
         User.findOne({ username }, (err, user) => {
             if (err) return done(err);
             if (!user) return done(null, false, { message: 'Incorrect Email' });

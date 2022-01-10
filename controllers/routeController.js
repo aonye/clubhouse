@@ -5,31 +5,23 @@ const bcrypt = require('bcryptjs');
 let async = require('async');
 
 exports.index = (req, res) => { //index
-    res.render('index');
+    console.log(res.locals.currentUser, 'index GET')
+    res.render('index', { user: res.locals.currentUser });
 }
 
 exports.login_get = (req, res, next) => {
-    res.render('login');
+    console.log(res.locals.currentUser, 'login GET')
+    res.render('login', { user: res.locals.currentUser });
 }
 
 exports.login_post = passport.authenticate("local", {
-    successRedirect: "/signup",
-    failureRedirect: "/",
+    successRedirect: "/messageboard",
+    failureRedirect: "/login",
 });
 
-// (req, res, next) => {
-//     passport.authenticate('local'),
-//         function (req, res) {
-//             console.log('hello')
-//             // If this function gets called, authentication was successful.
-//             // `req.user` contains the authenticated user.
-//             res.redirect('/' + req.body.username);
-//         };
-
-// }
-
 exports.signup_get = (req, res) => {
-    res.render('signup');
+    console.log(res.locals.currentUser, 'signup GET')
+    res.render('signup', { user: res.locals.currentUser });
 }
 
 exports.signup_post = (req, res, next) => {
@@ -37,8 +29,11 @@ exports.signup_post = (req, res, next) => {
         if (err) { return next(err) }
         else { //store hashpw in db
             const user = new User({
+                first_name: req.body.first_name,
+                last_name: req.body.last_name,
                 username: req.body.username,
                 password: hashedPassword,
+                membership: true,
             });
             console.log(user);
             user.save(err => {
@@ -54,6 +49,25 @@ exports.logout_get = (req, res, next) => {
     req.logout();
     res.redirect('login');
 };
+
+exports.messageboard_get = async (req, res, next) => {
+    const messages = await Message.find({}).populate('user').sort('timestamp');
+    console.log(res.locals.currentUser);
+    for (let i = 0; i < messages.length; i++) { //iterate through messages in O(n) and assign an index
+        messages[i].index = i;
+    }
+    if (!res.locals.currentUser) {
+        res.redirect('/');
+    } else {
+        res.render('messageboard', { user: res.locals.currentUser, messages });
+    }
+    //res.render('messageboard', { user: res.locals.currentUser, messages });
+    // if (!res.locals.currentUser) {
+    //     res.redirect('/');
+    // } else {
+
+    // }
+}
 
 // // Display list of all brands.
 // exports.brand_list = function (req, res) {

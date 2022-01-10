@@ -2,23 +2,23 @@ extends layout
 
 block content
   section.section-wrapper
-    h1 Login
+    h1 Login Form
 
-    a(href='/login') Login
-    a(href='/signup') SignUp
-    a(href='/logout') Logout
+    div
+      a(href=`signup`)
+        button.color-change-button Not a member? Signup instead
 
     form(method='POST' action='')
       div.form-group
         label(for='username') Username: 
-        input.form-control(type='text', name='username')
+        input.form-control(type='text', name='username' required)
     
       div.form-group
         label(for='password') Password: 
-        input.form-control(type='password', name='password')
+        input.form-control(type='password', name='password' required)
     
       div.form-group
         label(for='confirmpw') Confirm Password: 
-        input.form-control(type='password', name='confirmpw')
+        input.form-control(type='password', name='confirmpw' required)
 
-      button.btn.btn-primary(type='submit') Submit
+      button.color-change-button(type='submit') Submit

@@ -16,7 +16,16 @@ router.get('/signup', route_controller.signup_get);
 /* POST req for signup page. */
 router.post('/signup', route_controller.signup_post);
 
+/* GET logout page. */
 router.get('/logout', route_controller.logout_get);
+
+/* GET logout page. */
+router.get('/messageboard', route_controller.messageboard_get);
+
+
+
+
+
 
 // // /* GET sign-up page. */
 // router.get('/sign-up', (req, res) => {
