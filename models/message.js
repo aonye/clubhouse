@@ -1,5 +1,4 @@
 let mongoose = require('mongoose');
-const { DateTime } = require("luxon");
 
 let Schema = mongoose.Schema;
 
@@ -18,11 +17,5 @@ let MessageSchema = new Schema(
 //     .get(function () {
 //         return '/message/' + this._id;
 //     });
-
-MessageSchema
-    .virtual('date_formatted')
-    .get(function () {
-        return DateTime.fromJSDate(this.date_of_birth).toISODate(DateTime.DATE_SHORT);
-    });
 
 module.exports = mongoose.model('Message', MessageSchema);

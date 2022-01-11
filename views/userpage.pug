@@ -2,25 +2,40 @@ extends layout
 
 block content
   section.section-wrapper
-    h1 Placeholder Userpage
+    h1 Update Account Information
 
-    a(href='/login') Login
-    a(href='/signup') SignUp
-
-    if users !== undefined
-      a(href='/logout') Logout
+    div
+      a(href=`/messageboard`)
+        button.color-change-button Back to messageboard
 
     form(method='POST' action='')
       div.form-group
-        label(for='username') Username: 
-        input.form-control(type='text', name='username')
+        label(for='first_name') First Name: 
+        input.form-control(type='text', name='first_name' minlength=1 maxlength=20 required value=(undefined===user ? '' : user.first_name))
+      
+      div.form-group
+        label(for='last_name') Last Name:
+        input.form-control(type='text', name='last_name' minlength=1 maxlength=20 required value=(undefined===user ? '' : user.last_name))
+      
+      div.form-group
+        label(for='username') Username (email): 
+        input.form-control(type='email', name='username' minlength=1 maxlength=30 required value=(undefined===user ? '' : user.username))
     
       div.form-group
-        label(for='password') Password: 
-        input.form-control(type='password', name='password')
+        label(for='password') New Password: 
+        input.form-control(type='password', name='password' minlength=6 maxlength=30 required)
     
       div.form-group
         label(for='confirmpw') Confirm Password: 
-        input.form-control(type='password', name='confirmpw')
+        input.form-control(type='password', name='confirmpw' minlength=6 maxlength=30 required)
+      
+      div.form-group
+        label(for='membership') Clubhouse Exclusive Membership Code: 
+        input.form-control(type='text', name='membership')
 
-      button.btn.btn-primary(type='submit') Submit
+      button.color-change-button(type='submit') Submit
+    
+    if errors
+      ul.mb-50
+        for error in errors
+          li!= error.msg

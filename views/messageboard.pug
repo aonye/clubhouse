@@ -12,42 +12,45 @@ block content
           for message in messages
             if user.membership_status === false
               if message.index % 2 === 0
-                div.left-msg
-                  img(class='chat-acct-icon' src='/assets/images/chat_acct_icon.png' height='30' width='30' style='margin-right: 5px')
-                  div
-                    span Anonymous Andy | #{message.title}
+                div.left-msg.msg-unit
+                  img(class='chat-acct-icon' src='/assets/images/chat_acct_icon.png' height='30' width='30' style='margin-right: 5px, border-radius: 50%')
+                  div.msg-info
+                    span.msg-header Anonymous Andy | #{message.title}
                     div #{message.text}
               else
-                div.right-msg
-                  div
-                    span Anonymous Andy | #{message.title}
+                div.right-msg.msg-unit
+                  div.msg-info
+                    span.msg-header Anonymous Andy | #{message.title}
                     div #{message.text}
                   img(class='chat-acct-icon' src='/assets/images/chat_acct_icon.png' height='30' width='30' style='margin-left: 5px, border-radius: 50%')
             else
               if message.index % 2 === 0
-                div.left-msg
-                  img(class='chat-acct-icon' src='/assets/images/chat_acct_icon.png' height='30' width='30' style='margin-right: 5px')
-                  div
-                    span #{message.user.username} | #{message.title}
+                div.left-msg.msg-unit
+                  img(class='chat-acct-icon' src='/assets/images/chat_acct_icon.png' height='30' width='30' style='margin-right: 5px, border-radius: 50%')
+                  div.msg-info
+                    span.msg-header #{message.user.username} | #{message.title}
                     div #{message.text}
               else
-                div.right-msg
-                  div
-                    span #{message.user.username} | #{message.title}
+                div.right-msg.msg-unit
+                  div.msg-info
+                    span.msg-header #{message.user.username} | #{message.title}
                     div #{message.text}
                   img(class='chat-acct-icon' src='/assets/images/chat_acct_icon.png' height='30' width='30' style='margin-left: 5px, border-radius: 50%')
-        
-    form(class='msgs-form' method='POST' action='')
-      div.form-group
-        label(for='username') Username: 
-        input.form-control(type='text', name='username')
-    
-      div.form-group
-        label(for='password') Password: 
-        input.form-control(type='password', name='password')
-    
-      div.form-group
-        label(for='confirmpw') Confirm Password: 
-        input.form-control(type='password', name='confirmpw')
 
-      button.btn.btn-primary(type='submit') Submit
+    div.msgboard-form-cont.mb-50  
+      h2 Submit a Message
+      form(class='msgs-form' method='POST' action='')
+        div.form-group
+          label(for='title') Message Title: 
+          input.form-control(type='text', name='title' minlength=1, maxlength=20 required)
+      
+        div.form-group
+          label(for='text') Text: 
+          textarea.form-control.textarea(type='text', name='text' minlength=1, maxlength=280 required)
+
+        button.color-change-button(type='submit') Submit
+    
+    if errors
+      ul.mb-50
+        for error in errors
+          li!= error.msg

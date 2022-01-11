@@ -1,18 +1,25 @@
+const { body, validationResult } = require('express-validator');
 const User = require('../models/user');
 const Message = require('../models/message');
 const passport = require('../passport');
 const bcrypt = require('bcryptjs');
-let async = require('async');
 
+//block access to index/login/signup when logged in
 exports.index = (req, res) => { //index
-    console.log(res.locals.currentUser, 'index GET')
-    res.render('index', { user: res.locals.currentUser });
-}
+    //console.log(res.locals.currentUser, 'index GET')
+    if (res.locals.currentUser !== undefined) {
+        res.redirect('/messageboard');
+    }
+    res.render('index');
+};
 
-exports.login_get = (req, res, next) => {
-    console.log(res.locals.currentUser, 'login GET')
-    res.render('login', { user: res.locals.currentUser });
-}
+exports.login_get = (req, res) => {
+    //console.log(res.locals.currentUser, 'login GET')
+    if (res.locals.currentUser !== undefined) {
+        res.redirect('/messageboard');
+    }
+    res.render('login');
+};
 
 exports.login_post = passport.authenticate("local", {
     successRedirect: "/messageboard",
@@ -20,225 +27,124 @@ exports.login_post = passport.authenticate("local", {
 });
 
 exports.signup_get = (req, res) => {
-    console.log(res.locals.currentUser, 'signup GET')
+    //console.log(res.locals.currentUser, 'signup GET')
+    if (res.locals.currentUser !== undefined) {
+        res.redirect('/messageboard');
+    }
     res.render('signup', { user: res.locals.currentUser });
-}
+};
 
-exports.signup_post = (req, res, next) => {
-    bcrypt.hash(req.body.password, 5, (err, hashedPassword) => {
-        if (err) { return next(err) }
-        else { //store hashpw in db
-            const user = new User({
+exports.signup_post = [
+    body('first_name').trim().isLength({ min: 1, max: 20 }).withMessage('First name is too long').escape(),
+    body('last_name').trim().isLength({ min: 1, max: 20 }).withMessage('Last name is too long').escape(),
+    body('username').trim()
+        .isLength({ min: 1, max: 30 }).withMessage('Entry is too long.')
+        .isEmail().withMessage('Entry is not an email.')
+        .custom((username) => {
+            return User.findOne({ username }).then((productName) => {
+                if (productName) {
+                    return Promise.reject('Username (email) is already taken.');
+                }
+            });
+        })
+        .escape(),
+    body('password').trim().isLength({ min: 6, max: 30 }).withMessage('Password must be between 6 and 30 chars'), //don't escape (mutates pw)
+    body('confirmpw').trim().isLength({ min: 6, max: 30 }).withMessage('Password must be between 6 and 30 chars')
+        .custom((confirmpw, { req }) => {
+            if (confirmpw !== req.body.password) {
+                throw new Error('Passwords must match');
+            }
+            return true;
+        }),
+    body('membership', 'Must not be empty').trim().escape(),
+
+    (req, res, next) => {
+
+        const errors = validationResult(req);
+
+        let user = new User(
+            {
                 first_name: req.body.first_name,
                 last_name: req.body.last_name,
                 username: req.body.username,
-                password: hashedPassword,
-                membership: true,
-            });
-            console.log(user);
-            user.save(err => {
-                if (err) { return next(err); }
-                res.redirect("/");
+                password: req.body.password,
+                membership_status: false,
             });
 
+        user.membership_status = req.body.membership === process.env.SECRET ? true : false;
+
+        if (!errors.isEmpty()) {
+            res.render('signup', { user, errors: errors.array() });
+            return;
         }
-    });
-}
 
-exports.logout_get = (req, res, next) => {
+        bcrypt.hash(user.password, 5, (err, hashedPassword) => {
+            if (err) { return next(err) }
+            else { //store hashpw in db, save user
+                user.password = hashedPassword;
+                user.save(err => {
+                    if (err) { return next(err); }
+                    req.login(user, function (err) {
+                        if (err) { return next(err); }
+                        return res.redirect('/messageboard');
+                    });
+                });
+            }
+        });
+    }
+];
+
+exports.logout_get = (req, res) => {
     req.logout();
-    res.redirect('login');
+    res.redirect('/login');
 };
 
-exports.messageboard_get = async (req, res, next) => {
+exports.messageboard_get = async (req, res) => { //private route
     const messages = await Message.find({}).populate('user').sort('timestamp');
-    console.log(res.locals.currentUser);
     for (let i = 0; i < messages.length; i++) { //iterate through messages in O(n) and assign an index
         messages[i].index = i;
     }
-    if (!res.locals.currentUser) {
+    if (res.locals.currentUser === undefined) {
         res.redirect('/');
-    } else {
-        res.render('messageboard', { user: res.locals.currentUser, messages });
     }
-    //res.render('messageboard', { user: res.locals.currentUser, messages });
-    // if (!res.locals.currentUser) {
-    //     res.redirect('/');
-    // } else {
+    res.render('messageboard', { user: res.locals.currentUser, messages });
+};
 
-    // }
-}
+exports.messageboard_post = [
+    body('title').trim().isLength({ min: 1, max: 20 }).withMessage('Title must be between 1 and 20 characters in length').escape(),
+    body('text').trim().isLength({ min: 1, max: 280 }).withMessage('Text must be between 1 and 280 characters in length').escape(),
 
-// // Display list of all brands.
-// exports.brand_list = function (req, res) {
-//     Brand.find()
-//         .exec(function (err, brand_list) {
-//             if (err) { return next(err); }
-//             res.render('brands', { title: 'Brand List', brand_list });
-//         });
-// };
+    async (req, res, next) => {
+        const user = await User.findById(res.locals.currentUser.id);
 
-// // Display detail page for a specific brand.
-// exports.brand_detail = function (req, res, next) {
-//     async.parallel({
-//         brand: function (callback) {
-//             Brand.findById(req.params.id)
-//                 .exec(callback);
-//         },
-//         brand_models: function (callback) {
-//             Model.find({ 'brand': req.params.id })
-//                 .exec(callback);
-//         },
+        if (!user) {
+            res.redirect('/messageboard');
+        }
 
-//     }, function (err, results) {
-//         if (err) { return next(err); }
-//         if (results.brand === undefined) { // Model does not exist.
-//             var err = new Error('Model not found');
-//             err.status = 404;
-//             return next(err);
-//         }
-//         res.render('brand_detail', { title: 'Brand Details', brand: results.brand, brand_models: results.brand_models });
-//     });
-// };
+        const errors = validationResult(req);
 
-// // Display brand create form on GET.
-// exports.brand_create_get = function (req, res) {
-//     res.render('brand_form', { title: 'Create Brand' });
-// };
+        const message = new Message({
+            title: req.body.title,
+            timestamp: new Date(),
+            text: req.body.text,
+            user,
+        });
 
-// // Handle brand create on POST.
-// exports.brand_create_post = [
-//     // Validate and santize the name field.
-//     body('name', 'Brand name required').trim().isLength({ min: 1 }).escape(),
+        if (!errors.isEmpty()) {
+            const messages = await Message.find({}).populate('user').sort('timestamp');
+            for (let i = 0; i < messages.length; i++) { //iterate through messages in O(n) and assigns an index
+                messages[i].index = i;
+            }
+            if (!res.locals.currentUser) {
+                res.redirect('/');
+            }
+            res.render('messageboard', { user, messages, message, errors: errors.array() });
+            return;
+        }
 
-//     // Process request after validation and sanitization.
-//     (req, res, next) => {
-
-//         // Extract the validation errors from a request.
-//         const errors = validationResult(req);
-
-//         // Create a category object with escaped and trimmed data.
-//         var brand = new Brand(
-//             { name: req.body.name }
-//         );
-
-//         if (!errors.isEmpty()) { // There are errors. Render the form again with sanitized values/error messages.
-//             res.render('brand_form', { title: 'Create Brand', brand, errors: errors.array() });
-//             return;
-//         }
-//         else {
-//             // Data from form is valid.
-//             // Check if same name already exists.
-//             Brand.findOne({ 'name': req.body.name })
-//                 .exec(function (err, found) {
-//                     if (err) { return next(err); }
-
-//                     if (found) {
-//                         // Exists, redirect to its detail page.
-//                         res.redirect(found.url);
-//                     }
-//                     else {
-//                         brand.save((err) => {
-//                             if (err) { return next(err); }
-//                             // Saved. Redirect to detail page.
-//                             res.redirect(brand.url);
-//                         });
-
-//                     }
-
-//                 });
-//         }
-//     }
-// ];
-
-
-// // Display brand delete form on GET.
-// exports.brand_delete_get = function (req, res, next) { //If there are any models that use brand, do not allow deletion
-//     async.parallel({
-//         brand: function (callback) {
-//             Brand.findById(req.params.id)
-//                 .exec(callback)
-//         },
-//         brand_models: function (callback) {
-//             Model.find({ 'brand': req.params.id })
-//                 .exec(callback)
-//         },
-//     }, function (err, results) {
-//         if (err) { return next(err); }
-//         if (!results.brand) { // No results.
-//             res.redirect('/brands');
-//         }
-//         res.render('brand_delete', { title: 'Delete Brand', brand: results.brand, brand_models: results.brand_models });
-//     });
-// };
-
-// // Handle brand delete on POST.
-// exports.brand_delete_post = function (req, res, next) {
-//     async.parallel({
-//         brand: function (callback) {
-//             Brand.findById(req.body.brandid)
-//                 .exec(callback)
-//         },
-//         brand_models: function (callback) {
-//             Model.find({ 'brand': req.body.brandid })
-//                 .exec(callback)
-//         },
-//     }, function (err, results) {
-//         if (err) { return next(err); }
-//         if (results.brand_models.length > 0) { // Some model still uses this brand.
-//             res.render('brand_delete', { title: 'Delete Brand', brand: results.brand, brand_models: results.brand_models });
-//             return;
-//         }
-//         else {// Okay to delete. Redirect after
-//             Brand.findByIdAndRemove(req.body.brandid, (err) => {
-//                 if (err) { return next(err); }
-//                 res.redirect('/brands');
-//             })
-//         }
-//     });
-// };
-
-// // Display brand update form on GET.
-// exports.brand_update_get = async function (req, res) {
-//     const brand = await Brand.findById(req.params.id).orFail(() => Error('Brand not found'));
-//     res.render('brand_form', { title: 'Update Brand', brand });
-// };
-
-// // Handle brand update on POST.
-// exports.brand_update_post = [
-
-//     body('name', 'Brand name required').trim().isLength({ min: 1 }).escape(),
-
-//     async (req, res, next) => {
-
-//         const errors = validationResult(req);
-
-//         var brand = new Brand(
-//             {
-//                 name: req.body.name,
-//                 _id: req.params.id,
-//             }
-//         );
-
-//         if (!errors.isEmpty()) { // There are errors. Render the form again with sanitized values/error messages.
-//             res.render('brand_form', { title: 'Create Brand', brand, errors: errors.array() });
-//             return;
-//         }
-//         else {
-//             // Data from form is valid. 
-//             Brand.findOne({ 'name': req.body.name })
-//                 .exec(function (err, found) {
-//                     if (err) { return next(err); }
-//                     if (found) { //Check if same name already exists.
-//                         res.redirect(found.url);
-//                     }
-//                     else {
-//                         Brand.findByIdAndUpdate(req.params.id, brand, {}, (err, result) => { // (id, obj to update w/, options (obj - empty), callback)
-//                             if (err) { return next(err); }
-//                             res.redirect(result.url);
-//                         });
-//                     }
-//                 });
-//         }
-//     }
-// ];
+        message.save(err => {
+            if (err) { return next(err); }
+            return res.redirect('/messageboard');
+        });
+    }
+];

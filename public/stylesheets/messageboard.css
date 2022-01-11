@@ -1,13 +1,13 @@
 .msgs-cont-wrapper {
     background-color: white;
-    height: 100% !important;
+    height: 100%;
     min-height: 800px;
     width: 900px;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
-    border-radius: 5%;
+    border-radius: 2%;
 }
 
 .msgs-cont {
@@ -21,28 +21,33 @@
     flex-flow: column wrap;
 }
 
-.msg-unit-wrapper {
-    display: flex;
-    align-items: center
-}
-
-.left-msg {
-    display: flex;
-    align-items: center;
-    width: fit-content;
-    max-width: 40%;
-}
-
 .msgs-cont * {
     background-color: rgb(228, 230, 235);
     border-radius: 5%;
 }
 
-.right-msg {
+.msg-unit {
     display: flex;
+    flex-direction: row;
+    justify-content: space-around;
     align-items: center;
-    width: fit-content;
-    max-width: 40%;
+    width: 350px;
+}
+
+.msg-info { /*match the overflow textbox size */
+    width: 300px;
+}
+
+.msg-info * { /*targets the actual textbox */
+    overflow-wrap: break-word;
+    inline-size: 300px;
+}
+
+.left-msg {
+    align-self: flex-start;
+}
+
+.right-msg {
     align-self: flex-end;
 }
 
@@ -50,6 +55,21 @@
     border-radius: 50%;
 }
 
-.msgs-form {
-    margin: 50px 50px 50px 50px;
+.msg-header {
+    font-weight: 600;
+}
+
+/* Messageboard form specific */
+.msgboard-form-cont {
+    margin-top: 2rem;
+    width: 80%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.textarea {
+    min-height: 150px;
+    font-family: sans-serif;
 }

@@ -1,11 +1,5 @@
 @import url('../stylesheets/main.css');
 @import url('../stylesheets/messageboard.css');
-/* @import url('../stylesheets/index.css'); */
-
-/* @import url('../stylesheets/devices.css');
-@import url('../stylesheets/categories.css');
-@import url('../stylesheets/brands.css');
-@import url('../stylesheets/models.css'); */
 
 nav {
     display: flex;
@@ -100,22 +94,7 @@ footer {
     height: 20px;
 }
 
-footer a {
-    color: black;
-}
-
-.body-wrapper {
-    width: 500px;
-    height: 500px;
-    background-color: purple;
-}
-
-
-html, body {
-  height: 100%;
-  margin: 0;
-}
-
+/* CONFIGURE STICKY FOOTER */
 .wrapper {
   min-height: 100%;
   /* Equal to height of footer */
