@@ -3,9 +3,8 @@
 /**
  * Module dependencies.
  */
-
-let app = require('../app');
-var debug = require('debug')('notpcpartpicker:server');
+var app = require('../app');
+var debug = require('debug')('clubhouse:server');
 var http = require('http');
 
 /**

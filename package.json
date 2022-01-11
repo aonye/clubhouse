@@ -6,7 +6,7 @@
     },
     "private": true,
     "scripts": {
-        "start": "NODE_ENV=production node ./bin/www",
+        "start": "node ./bin/www",
         "devstart": "nodemon ./bin/www",
         "serverstart": "DEBUG=clubhouse:* npm run devstart"
     },
