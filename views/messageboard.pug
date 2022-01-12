@@ -6,36 +6,85 @@ block content
     
     if messages === undefined
       span No messages
+
     else
       section.msgs-cont-wrapper
         div.msgs-cont
           for message in messages
-            if user.membership_status === false
-              if message.index % 2 === 0
-                div.left-msg.msg-unit
-                  img(class='chat-acct-icon' src='/assets/images/chat_acct_icon.png' height='30' width='30' style='margin-right: 5px, border-radius: 50%')
-                  div.msg-info
-                    span.msg-header Anonymous Andy | #{message.title}
-                    div #{message.text}
+            if user.admin_status === true
+
+              if user.membership_status === false
+
+                if message.index % 2 === 0
+                  div.msg-unit.left-msg
+                    div.msg-icons
+                      img(class='chat-acct-icon' src='/assets/images/chat_acct_icon.png' height='30' width='30' style='border-radius: 50%')
+                      a(href=`/messageboard/${message.id}/delete`)
+                        img(class='delete-msg-icon' src='/assets/images/trashbin.png' height='20' width='20')
+                    div.msg-info
+                      span.msg-header Anonymous Andy | #{message.title} | #{message.timestamp_format}
+                      div #{message.text}
+                else
+                  div.msg-unit.right-msg
+                    div.msg-info
+                      span.msg-header Anonymous Andy | #{message.title} | #{message.timestamp_format}
+                      div #{message.text}
+                    div.msg-icons
+                      img(class='chat-acct-icon' src='/assets/images/chat_acct_icon.png' height='30' width='30' style='border-radius: 50%')
+                      a(href=`/messageboard/${message.id}/delete`)
+                        img(class='delete-msg-icon' src='/assets/images/trashbin.png' height='20' width='20')
+              
               else
-                div.right-msg.msg-unit
-                  div.msg-info
-                    span.msg-header Anonymous Andy | #{message.title}
-                    div #{message.text}
-                  img(class='chat-acct-icon' src='/assets/images/chat_acct_icon.png' height='30' width='30' style='margin-left: 5px, border-radius: 50%')
-            else
-              if message.index % 2 === 0
-                div.left-msg.msg-unit
-                  img(class='chat-acct-icon' src='/assets/images/chat_acct_icon.png' height='30' width='30' style='margin-right: 5px, border-radius: 50%')
-                  div.msg-info
-                    span.msg-header #{message.user.username} | #{message.title}
-                    div #{message.text}
+
+                if message.index % 2 === 0
+                  div.msg-unit.left-msg
+                    div.msg-icons
+                      img(class='chat-acct-icon' src='/assets/images/chat_acct_icon.png' height='30' width='30' style='border-radius: 50%')
+                      a(href=`/messageboard/${message.id}/delete`)
+                        img(class='delete-msg-icon' src='/assets/images/trashbin.png' height='20' width='20')
+                    div.msg-info
+                      span.msg-header #{message.user.username} | #{message.title} | #{message.timestamp_format}
+                      div #{message.text}
+                else
+                  div.msg-unit.right-msg
+                    div.msg-info
+                      span.msg-header #{message.user.username} | #{message.title} | #{message.timestamp_format}
+                      div #{message.text}
+                    div.msg-icons
+                      img(class='chat-acct-icon' src='/assets/images/chat_acct_icon.png' height='30' width='30' style='border-radius: 50%')
+                      a(href=`/messageboard/${message.id}/delete`)
+                        img(class='delete-msg-icon' src='/assets/images/trashbin.png' height='20' width='20')
+
+            else if user.admin_status === false
+              
+              if user.membership_status === false
+                
+                if message.index % 2 === 0
+                  div.left-msg.msg-unit
+                    img(class='chat-acct-icon' src='/assets/images/chat_acct_icon.png' height='30' width='30' style='margin-right: 5px, border-radius: 50%')
+                    div.msg-info
+                      span.msg-header Anonymous Andy | #{message.title} | #{message.timestamp_format}
+                      div #{message.text}
+                else
+                  div.right-msg.msg-unit
+                    div.msg-info
+                      span.msg-header Anonymous Andy | #{message.title} | #{message.timestamp_format}
+                      div #{message.text}
+                    img(class='chat-acct-icon' src='/assets/images/chat_acct_icon.png' height='30' width='30' style='margin-left: 5px, border-radius: 50%')
               else
-                div.right-msg.msg-unit
-                  div.msg-info
-                    span.msg-header #{message.user.username} | #{message.title}
-                    div #{message.text}
-                  img(class='chat-acct-icon' src='/assets/images/chat_acct_icon.png' height='30' width='30' style='margin-left: 5px, border-radius: 50%')
+
+                if message.index % 2 === 0
+                  div.left-msg.msg-unit
+                    img(class='chat-acct-icon' src='/assets/images/chat_acct_icon.png' height='30' width='30' style='margin-right: 5px, border-radius: 50%')
+                    div.msg-info
+                      span.msg-header #{message.user.username} | #{message.title} | #{message.timestamp_format}
+                      div #{message.text}
+                else
+                  div.right-msg.msg-unit
+                    div.msg-info
+                      span.msg-header #{message.user.username} | #{message.title} | #{message.timestamp_format}
+                      div #{message.text}
+                    img(class='chat-acct-icon' src='/assets/images/chat_acct_icon.png' height='30' width='30' style='margin-left: 5px, border-radius: 50%')
 
     div.msgboard-form-cont.mb-50  
       h2 Submit a Message

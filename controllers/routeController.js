@@ -3,6 +3,9 @@ const User = require('../models/user');
 const Message = require('../models/message');
 const passport = require('../passport');
 const bcrypt = require('bcryptjs');
+const { DateTime, Settings } = require('luxon');
+
+Settings.defaultZoneName = "America/New York";
 
 //block access to index/login/signup when logged in
 exports.index = (req, res) => { //index
@@ -56,7 +59,8 @@ exports.signup_post = [
             }
             return true;
         }),
-    body('membership', 'Must not be empty').trim().escape(),
+    body('membership').trim(),
+    body('admin_status').trim().isBoolean({ loose: true }),
 
     (req, res, next) => {
 
@@ -68,13 +72,13 @@ exports.signup_post = [
                 last_name: req.body.last_name,
                 username: req.body.username,
                 password: req.body.password,
-                membership_status: false,
             });
 
         user.membership_status = req.body.membership === process.env.SECRET ? true : false;
+        user.admin_status = req.body.admin_status === 'True' ? true : false;
 
         if (!errors.isEmpty()) {
-            res.render('signup', { user, errors: errors.array() });
+            res.render('signup', { user, admin_result: req.body.admin_status, errors: errors.array() });
             return;
         }
 
@@ -123,12 +127,16 @@ exports.messageboard_post = [
 
         const errors = validationResult(req);
 
+        const datetime = DateTime.local();
+
         const message = new Message({
             title: req.body.title,
-            timestamp: new Date(),
+            timestamp: datetime.toISO(),
             text: req.body.text,
             user,
         });
+
+        console.log(message.timestamp);
 
         if (!errors.isEmpty()) {
             const messages = await Message.find({}).populate('user').sort('timestamp');
@@ -148,3 +156,13 @@ exports.messageboard_post = [
         });
     }
 ];
+
+exports.messageboard_delete_get = async (req, res, next) => { //private route
+    if (res.locals.currentUser === undefined) {
+        res.redirect('/');
+    }
+    Message.findByIdAndDelete(req.params.id, (err) => {
+        if (err) { return next(err); }
+        res.redirect('/messageboard');
+    });
+};

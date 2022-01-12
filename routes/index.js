@@ -21,5 +21,7 @@ router.post('/signup', route_controller.signup_post);
 router.get('/messageboard', route_controller.messageboard_get);
 /* POST msgboard page. */
 router.post('/messageboard', route_controller.messageboard_post);
+/* DELETE message - msgboard page. */
+router.get('/messageboard/:id/delete', route_controller.messageboard_delete_get);
 
 module.exports = router;

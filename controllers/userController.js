@@ -17,10 +17,18 @@ exports.user_update_post = [
     body('username').trim()
         .isLength({ min: 1, max: 30 }).withMessage('Entry is too long.')
         .isEmail().withMessage('Entry is not an email.')
-        .custom((username) => {
-            return User.findOne({ username }).then((productName) => {
-                if (productName) {
-                    return Promise.reject('Username (email) is already taken.');
+        .custom((username, { req }) => {
+            return User.findById(req.params.id).then((user) => { // check if the name is unchanged
+                if (user.username === username) {
+                    console.log('same name')
+                    return Promise.resolve();
+                } else {
+                    return User.findOne({ username }).then((res) => { //check if name is already taken
+                        if (res) {
+                            console.log('already taken')
+                            return Promise.reject('Username (email) is already taken.');
+                        }
+                    });
                 }
             });
         })
@@ -36,7 +44,8 @@ exports.user_update_post = [
     body('membership', 'Must not be empty').trim().escape(),
 
     async (req, res, next) => {
-
+        const status = await User.findById(req.params.id, 'admin_status');
+        console.log(status);
         const errors = validationResult(req);
 
         let user = new User(
@@ -46,6 +55,7 @@ exports.user_update_post = [
                 username: req.body.username,
                 password: req.body.password,
                 membership_status: false,
+                admin_status: status.admin_status,
                 _id: req.params.id,
             });
 

@@ -7,7 +7,7 @@
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
-    border-radius: 2%;
+    border-radius: 30px;
 }
 
 .msgs-cont {
@@ -31,16 +31,24 @@
     flex-direction: row;
     justify-content: space-around;
     align-items: center;
-    width: 350px;
+    width: 300px;
+}
+
+.msg-icons {
+    display: flex;
+    flex-flow: column wrap;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 60px;
 }
 
 .msg-info { /*match the overflow textbox size */
-    width: 300px;
+    width: 250px;
 }
 
 .msg-info * { /*targets the actual textbox */
     overflow-wrap: break-word;
-    inline-size: 300px;
+    inline-size: 250px;
 }
 
 .left-msg {

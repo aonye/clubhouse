@@ -2,6 +2,8 @@ extends layout
 
 block content
   section.section-wrapper
+    script.
+
     h1 Signup for Clubhouse
 
     div
@@ -11,7 +13,7 @@ block content
     form(method='POST' action='')
       div.form-group
         label(for='first_name') First Name: 
-        input.form-control(type='text', name='first_name' minlength=1 maxlength=20 required value=(undefined===user? '' : user.first_name))
+        input.form-control(type='text', name='first_name' minlength=1 maxlength=20 required='true' value=(undefined===user? '' : user.first_name))
       
       div.form-group
         label(for='last_name') Last Name:
@@ -32,6 +34,16 @@ block content
       div.form-group
         label(for='membership') Clubhouse Exclusive Membership Code: 
         input.form-control(type='text', name='membership')
+
+      div.form-group
+        label(for='admin_status') Admin status:
+        select.form-control(type='select' placeholder='Select status' name='admin_status' required='true')
+          if user
+            for value in user.admin_array
+              option(value=value selected=(value===admin_result ? 'selected' : false)) #{value}
+          else   
+            option(value='True') True
+            option(value='False') False
 
       button.color-change-button(type='submit') Submit
     
